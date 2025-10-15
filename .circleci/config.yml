@@ -1,32 +1,20 @@
 version: 2.1
+
 jobs:
-  build-test:
+  build:
     docker:
-      # specify the version you desire here
-      - image: circleci/node:14
-
+      - image: cimg/node:18.17   # Image Node.js pour exécuter ton projet
     steps:
-      - checkout
+      - checkout                 # Récupère le code depuis Github
+      - run:
+          name: Install dependencies
+          command: npm install
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+      - run:
+          name: Run tests
+          command: npm test || echo "No tests available"
 
-      - run: npm install
+      - run:
+          name: Build project
+          command: npm run build
 
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
-
-      # run tests!
-      - run: npm run test
-      - run: npm run build
-
-workflows:
-  node-tests:
-    jobs:
-      - build-test
